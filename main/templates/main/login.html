@@ -1,0 +1,65 @@
+{% extends "main/index.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block scripts %}
+<script src="{% static 'js/account/pass_reset.js' %}"></script>
+<script>
+    var token = '{{ csrf_token }}'
+    var reset_url = "{% url 'recovery' %}"
+</script>
+{% endblock scripts %}
+
+{% block login %}
+<a class="navbar-brand" href="{% url 'games' %}">Play directly</a>
+{% endblock %}
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div style="padding-top: 2%;">
+        <button class="btn btn-dark" type="submit">Login</button>
+        <button class="btn btn-dark" type="button" onclick="reset_purge(); $('#pass_reset_modal').modal('show')">
+            Password recovery
+        </button>
+    </div>
+</form>
+<!-- pass reset -->
+<div class="modal fade" id="pass_reset_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="reset_label" class="modal-title">Change password:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="reset_purge()">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="control-group">
+                    <label for="id_email" class="control-label requiredField">
+                        Email<span class="asteriskField">*</span>
+                    </label>
+                    <div class="controls">
+                        <input type="email" name="email" autocomplete="email" maxlength="254" class="emailinput"
+                            required="" id="id_email">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="reset_purge()">
+                    Close
+                </button>
+                <button id="reset_btn" type="button" class="btn btn-dark">
+                    <span id='loading' class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Confirm reset
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "main/index.html" %}
+{% load crispy_forms_tags %}
+{% block logout %}
+<a class="navbar-brand" href="{% url 'games' %}">Play directly</a>
+{% endblock %}
+{% block content %}
+<div style="text-align: left;">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-dark" type="submit">CONFIRM</button>
+    </form>
+</div>
+{% endblock %}

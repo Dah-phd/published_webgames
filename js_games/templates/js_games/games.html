@@ -1,0 +1,197 @@
+{% extends "main/index.html" %}
+{% block scripts %}
+{% load static %}
+<script>
+    var token = "{{ csrf_token }}";
+    const send_url = "{% url 'save_score' %}";
+    const login_url = "{% url 'modal_login' %}";
+</script>
+<script src="{% static 'js/games/main.js' %}"></script>
+<script src="{% static 'js/games/mines.js' %}"></script>
+<script src="{% static 'js/games/snake_logic.js' %}"></script>
+<script src="{% static 'js/games/tetris.js' %}"></script>
+{% endblock scripts %}
+{% block login %}
+{% if not user.is_authenticated %}
+<a class="navbar-brand" id='login_btn' href="#modal_login" data-bs-toggle="modal" role="button">Login</a>
+<a class="navbar-brand" href="{% url 'profile' %}" id='nametag' style="display: none;">username</a>
+{% endif %}
+{% endblock %}
+{% block logout %}
+{% if not user.is_authenticated %}
+<a class="navbar-brand" id='out_link' style="display: none;" href="{% url 'logout' %}">Logout</a>
+<a class="navbar-brand" id='register' href="{% url 'register' %}">Create new account</a>
+{% endif %}
+{% endblock %}
+{% block content %}
+<canvas id='root' style="display: none; border:10px solid #000000; margin-left: auto; margin-right: auto;"
+    oncontextmenu="return false"></canvas>
+<h2 id="score" style="margin-left: auto; margin-right: auto;"></h2>
+<!-- Buttons  -->
+<div class="row">
+    <div class="col-4">
+        <button id="python" class="btn-dark" style="width:100%"> New Python </button>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="game" value="python">
+            <button type="submit" class="btn-dark" style="width:100%"> python highscores </button>
+        </form>
+    </div>
+    <div class="col-4">
+        <button id="mine" class="btn-dark" style="width:100%"> New Mines</button>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="game" value="minesweeper">
+            <button type="submit" class="btn-dark" style="width:100%"> mines highscores </button>
+        </form>
+    </div>
+    <div class="col-4">
+        <button id="tetris" class="btn-dark" style="width:100%"> New Tetris </button>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="game" value="tetris">
+            <button type="submit" class="btn-dark" style="width:100%"> tetris highscores </button>
+        </form>
+    </div>
+</div>
+<!-- New score modal -->
+<div class="modal fade" id="score_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_label">New score</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="nick" class="col-form-label">
+                        {% if user.is_authenticated %}
+                        Comment:
+                        {% else %}
+                        Nick:
+                        {% endif %}
+                    </label>
+                    <textarea maxlength="20" class="form-control" id="nick"></textarea>
+                </div>
+                {% if not user.is_authenticated %}
+                <div style="text-align: end;">
+                    <a style="font-size: small;" href="#modal_login" data-bs-toggle="modal" role="button"
+                        onclick="if(window.score_modal){$('#score_modal').hide()}">
+                        Have account? Login
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="$('#send').off('click')">Cancel</button>
+                <button type="button" id='send' class="btn btn-dark" autofocus>Save Score</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% if game %}
+<!-- Highscore modal -->
+<div class="modal fade" id="score_board_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_label">Score Board</h5>
+                <button onclick="window.location.replace('{% url 'games' %}');" type="button" class="btn-close"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h3> {{ game }} </h3>
+                    <table class="table table-dark table-striped">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    #
+                                </th>
+                                <th>
+                                    Player
+                                </th>
+                                <th>
+                                    Nick/Comment
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Score
+                                </th>
+                            </tr>
+                            {% for score in scores %}
+                            <tr>
+                                <th>
+                                    {{ forloop.counter }}
+                                </th>
+                                <th>
+                                    {{ score.user.username }}
+                                </th>
+                                <th>
+                                    {{ score.nick }}
+                                </th>
+                                <th>
+                                    {{ score.date }}
+                                </th>
+                                <th>
+                                    {{ score.score }}
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
+                    onclick="window.location.replace('{% url 'games' %}');">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script> $('document').ready(function () { $('#score_board_modal').modal('show') })</script>
+{% endif %}
+{% if not user.is_authenticated %}
+<!-- login modal -->
+<div class="modal fade" id="modal_login" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="login_label">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="control-group"> <label for="id_username" class="control-label requiredField">
+                            Username<span class="asteriskField">*</span> </label>
+                        <div class="controls"> <input type="text" name="username" autofocus="" autocapitalize="none"
+                                autocomplete="username" maxlength="150" class="textinput textInput" required=""
+                                id="id_username"> </div>
+                    </div>
+                    <div class="control-group"> <label for="id_password" class="control-label requiredField">
+                            Password<span class="asteriskField">*</span> </label>
+                        <div class="controls"> <input type="password" name="password" autocomplete="current-password"
+                                class="textinput textInput" required="" id="id_password"> </div>
+                    </div>
+                </div>
+                <div style="text-align: end;">
+                    <a style="font-size: small;" href="{% url 'login' %}" role="button">
+                        Cannot login? Click here!
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id='login' class="btn btn-dark">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('document').ready(auth_view())
+</script>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,156 @@
+{% extends "main/index.html" %}
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/account/main.js' %}"></script>
+<script>
+    var token = '{{ csrf_token }}'
+    var chpass_url = "{% url 'chpass' %}"
+</script>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col 4">
+        <h3>Python</h3>
+        <table class="table table-dark table-striped">
+            <tbody>
+                <tr>
+                    <th>#</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                </tr>
+                {% if not python %}
+                <tr>
+                    <td></td>
+                    <td>No scores in top 1000</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% else %}
+                {% for score in python %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ score.score }}</td>
+                    <td>{{ score.date }}</td>
+                    <td> {{ score.nick }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col 4">
+        <h3>Minesweeper</h3>
+        <table class="table table-dark table-striped">
+            <tbody>
+                <tr>
+                    <th>#</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                </tr>
+                {% if not minesweeper %}
+                <tr>
+                    <td></td>
+                    <td>No scores in top 1000</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% else %}
+                {% for score in minesweeper %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ score.score }}</td>
+                    <td>{{ score.date }}</td>
+                    <td> {{ score.nick }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col 4">
+        <h3>Tetris</h3>
+        <table class="table table-dark table-striped">
+            <tbody>
+                <tr>
+                    <th>#</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                </tr>
+                {% if not tetris %}
+                <tr>
+                    <td></td>
+                    <td>No scores in top 1000</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% else %}
+                {% for score in tetris %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ score.score }}</td>
+                    <td>{{ score.date }}</td>
+                    <td> {{ score.nick }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div style="text-align: center;">
+    <a href="{% url 'games' %}">
+        <h1 class="btn btn-dark" style="font-size: xx-large;">PLAY GAMES</h1>
+    </a>
+</div>
+<div style="text-align: center;">
+    <button class="btn btn-dark" style="font-size: x-large;"
+        onclick="chpass_purge(); $('#chpass_modal').modal('show')">Change
+        password</button>
+</div>
+<!-- change pass -->
+<div class="modal fade" id="chpass_modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="chpass_label" class="modal-title">Change password:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="chpass_purge()">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="control-group"> <label for="id_old_password" class="control-label requiredField">
+                        Old password <span class="asteriskField"> * </span>
+                    </label>
+                    <div class="controls"> <input type="password" name="old_password" autocomplete="current-password"
+                            autofocus="" class="textinput textInput" required="" id="id_old_password"> </div>
+                </div>
+                <p></p>
+                <div class="control-group"> <label for="id_new_password1" class="control-label requiredField">
+                        New password<span class="asteriskField">*</span> </label>
+                    <div class="controls"> <input type="password" name="new_password1" autocomplete="new-password"
+                            class="textinput textInput" required="" id="id_new_password1">
+                        <p class="help-block"></p>
+
+                    </div>
+                </div>
+                <div id="div_id_new_password2" class="control-group"> <label for="id_new_password2"
+                        class="control-label requiredField">
+                        New password confirmation<span class="asteriskField">*</span> </label>
+                    <div class="controls"> <input type="password" name="new_password2" autocomplete="new-password"
+                            class="textinput textInput" required="" id="id_new_password2">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="chpass_purge()">
+                    Close
+                </button>
+                <button id="chpass_btn" type="button" class="btn btn-dark">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
